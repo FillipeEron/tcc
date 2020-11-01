@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "606092014755",
+    "firebase_url": "https://arcore-5ae04.firebaseio.com",
+    "project_id": "arcore-5ae04",
+    "storage_bucket": "arcore-5ae04.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606092014755:android:913b57f6b02d269a553b16",
+        "android_client_info": {
+          "package_name": "com.example.playgrounsceneform"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606092014755-1qfj3bk50a8ei3i7kbhgp57usi7n0taa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS3NW9sccVqen12rqyrPkeRB7hENcjA5c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606092014755-1qfj3bk50a8ei3i7kbhgp57usi7n0taa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606092014755:android:4e5317114c1c015d553b16",
+        "android_client_info": {
+          "package_name": "com.tcc.denguedetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606092014755-1qfj3bk50a8ei3i7kbhgp57usi7n0taa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS3NW9sccVqen12rqyrPkeRB7hENcjA5c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606092014755-1qfj3bk50a8ei3i7kbhgp57usi7n0taa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
