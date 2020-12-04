@@ -11,7 +11,7 @@ class GrupoDeDados():
        for dado in dadosTreinoPositivo:
            imagem = Imagem(dado)
            pigmentacao = Pigmentacao(imagem)
-           pigmentacao.aplicacaoAleatoria(30)
+           pigmentacao.aplicacaoAleatoria(60)
            pigmentacao.moldeQuadratico()
            pigmentacao.tipoVermelhoVariavel(0.1, 0.5)
            pigmentacao.iniciarPigmentacao()
@@ -25,7 +25,7 @@ class GrupoDeDados():
         for dado in dadosValidacaoPositivo:
            imagem = Imagem(dado)
            pigmentacao = Pigmentacao(imagem)
-           pigmentacao.aplicacaoAleatoria(30)
+           pigmentacao.aplicacaoAleatoria(60)
            pigmentacao.moldeQuadratico()
            pigmentacao.tipoVermelhoVariavel(0.1, 0.5)
            pigmentacao.iniciarPigmentacao()

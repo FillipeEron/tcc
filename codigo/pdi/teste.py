@@ -2,8 +2,15 @@ from datasetBruto import *
 from fabricarDataset import *
 from grupoDeDados import *
 from random import randint
+from histoEquaDataset import *
 
-
+dataset = Dataset(CAMINHO_ABSOLUTO_DATASET + '/17_11_2020-9:3:36')
+histEquaDataset = HistogramaEqualizationDataset(dataset)
+histEquaDataset.aplicarHistogramaTreinoPositivo()
+histEquaDataset.aplicarHistogramaTreinoNegativo()
+histEquaDataset.aplicarHistogramaValidacaoPositivo()
+histEquaDataset.aplicarHistogramaValidacaoNegativo()
+'''
 datasetBruto = DatasetBruto()
 fabricarDataset = FabricarDataset(datasetBruto, CAMINHO_ABSOLUTO_DATASET)
 fabricarDataset.criarEstrutura()
@@ -16,7 +23,7 @@ grupoDeDados.aplicarPigmentacaoTreinoPositivo()
 grupoDeDados.aplicarPigmentacaoValidacaoPositivo()
 grupoDeDados.mudarParaFormatoPNGTreinoNegativo()
 grupoDeDados.mudarParaFormatoPNGValidacaoNegativo()
-
+'''
 
 '''
 dataset = Dataset(CAMINHO_ABSOLUTO_DATASET + '/11_11_2020-17:47:10')
