@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.ar.sceneform.plugin'
 
+project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
+
+assert file(project.ext.ASSET_DIR + "/model.tflite").exists()
+assert file(project.ext.ASSET_DIR + "/labels.txt").exists()
+
+
 android {
     compileSdkVersion 29
     //buildToolsVersion "29.0.1"
@@ -41,8 +47,11 @@ android {
 
     aaptOptions {
         noCompress "tflite"
-        noCompress "lite"
     }
+    lintOptions {
+        abortOnError false
+    }
+
     sourceSets {
         main {
             jni {
@@ -68,8 +77,13 @@ dependencies {
     implementation "com.google.ar.sceneform:animation:1.15.0"
     implementation "com.google.ar.sceneform:assets:1.15.0"
     implementation 'com.google.firebase:firebase-storage:17.0.0'
-    implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
-    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
+    //implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
+    //implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
+    implementation('org.tensorflow:tensorflow-lite:0.0.0-nightly') { changing = true }
+    implementation('org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly') { changing = true }
+    implementation('org.tensorflow:tensorflow-lite-support:0.0.0-nightly') { changing = true }
+    implementation 'com.google.ar:core:1.21.0'
+    implementation 'com.github.yalantis:ucrop:2.2.6-native'
     apply plugin: 'com.google.gms.google-services'
 
 }

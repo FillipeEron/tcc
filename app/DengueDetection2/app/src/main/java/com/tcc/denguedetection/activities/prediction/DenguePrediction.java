@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.tcc.denguedetection.R;
 import com.tcc.denguedetection.activities.login.MainActivity;
+import com.tcc.denguedetection.utils.Filter;
 import com.tcc.denguedetection.utils.ImageProcessing;
 
 import org.tensorflow.lite.Interpreter;
@@ -34,6 +35,8 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class DenguePrediction extends AppCompatActivity {
 
@@ -43,32 +46,20 @@ public class DenguePrediction extends AppCompatActivity {
     private TextView predictText;
     private Bitmap bitmapPrecessed;
 
-    private String  modelFile = "dengue_2.tflite";
-    private static final int RESULTS_TO_SHOW = 3;
-    private static final int IMAGE_MEAN = 128;
-    private static final float IMAGE_STD = 128.0f;
 
-    // int array to hold image data
-    private int[] intValues;
+    // New variables
+    private Classifier classifier;
 
-    // Variavel responsavel por receber o modelo e opções de configurações
-    private Interpreter tflite;
-    // Variavel para guarda a imagem em formato de byte
-    private ByteBuffer imgDataByte = null;
-    // Opção para o carregamento do modelo
-    private final Interpreter.Options tfliteOptions = new Interpreter.Options();
-    // Lista de Labels
-    private List<String> labelList = new ArrayList(Arrays.asList(new String[]{"Positibo", "Negativo"}));
-    private int sizeLabel = labelList.size();
-    // Array para guarda as probabilidades
-    //private float[][] labelProbArray = new float[1][labelList.size()];
-    private float[][] labelProbArray = new float[1][1];
+    // Github variaveis
+    private Executor executor = Executors.newSingleThreadExecutor();
+
+    private static final String MODEL_PATH = "model.tflite";
+    private static final boolean QUANT = false;
+    private static final String LABEL_PATH = "labels.txt";
+    private static final int INPUT_SIZE = 32;
+    // github variaveis
 
 
-    // input image dimensions for the Inception Model
-    private int DIM_IMG_SIZE_X = 35;
-    private int DIM_IMG_SIZE_Y = 35;
-    private int DIM_PIXEL_SIZE = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,30 +70,15 @@ public class DenguePrediction extends AppCompatActivity {
         predictText = findViewById(R.id.predictTextViewId);
         predictButton = findViewById(R.id.predictButtonId);
 
-
-        // initialize array that holds image data
-        intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
-
-        // Preparação da classe "Interpreter" para carregar o modelo de predição
-        try{
-            tflite = new Interpreter(loadModelFile(), tfliteOptions);
-            //labelList = loadLabelList();
-            //labelList.add("Positivo");
-            //labelList.add("Negativo");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        imgDataByte = ByteBuffer.allocateDirect(4 * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
-        imgDataByte.order(ByteOrder.nativeOrder());
-
         Uri cropImageUri = (Uri)getIntent().getParcelableExtra("cropImageUri");
 
         Bitmap bitmap = BitmapFactory.decodeFile(cropImageUri.getPath());
-        ImageProcessing imageProcessed  = new ImageProcessing(bitmap);
-        bitmapPrecessed = imageProcessed.mainProcessing().getBitmapProcessed();
-        imageView.setImageBitmap(bitmapPrecessed);
 
+        Filter filter = new Filter(bitmap);
+        filter.applyMedianBlur();
+        filter.applyClaheHistogram();
+
+        imageView.setImageBitmap(filter.getRenderedBitmap());
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,43 +90,38 @@ public class DenguePrediction extends AppCompatActivity {
         predictButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                convertBitmapToByteBuffer(bitmapPrecessed);
+                final List<Classifier.Recognition> results = classifier.recognizeImage(filter.getRenderedBitmap());
+                Classifier.Recognition recognition = results.get(0);
 
-                tflite.run(imgDataByte, labelProbArray);
-                Float prob = 100 * labelProbArray[0][0];
-                predictText.setText(prob.toString());
+                float threshold = 0.5f;
+
+                if (recognition.getConfidence() > threshold){
+                    predictText.setText( "Positivo: com " + String.format("%.2f", recognition.getConfidence() * 100.0f) + "% de confidência");
+                }else{
+                    predictText.setText( "Negativo: com " + String.format("%.2f", 100 - (recognition.getConfidence() * 100.0f) ) + "% de confidência");
+                }
+            }
+        });
+        initTensorFlowAndLoadModel();
+
+    }
+
+    private void initTensorFlowAndLoadModel() {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    classifier = TensorFlowImageClassifier.create(
+                            getAssets(),
+                            MODEL_PATH,
+                            LABEL_PATH,
+                            INPUT_SIZE,
+                            QUANT);
+                } catch (final Exception e) {
+                    throw new RuntimeException("Error initializing TensorFlow!", e);
+                }
             }
         });
     }
-
-    private MappedByteBuffer loadModelFile() throws IOException {
-        AssetFileDescriptor fileDescriptor = this.getAssets().openFd(modelFile);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }
-
-    private void convertBitmapToByteBuffer(Bitmap bitmap) {
-        if (imgDataByte == null) {
-            return;
-        }
-        imgDataByte.rewind();
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        // loop through all pixels
-        int pixel = 0;
-        for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
-            for (int j = 0; j < DIM_IMG_SIZE_Y; ++j) {
-                final int val = intValues[pixel++];
-                // get rgb values from intValues where each int holds the rgb values for a pixel.
-                imgDataByte.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                imgDataByte.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                imgDataByte.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-            }
-
-        }
-    }
-
 
 }

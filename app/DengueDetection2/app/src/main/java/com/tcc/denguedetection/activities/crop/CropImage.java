@@ -11,16 +11,17 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.soundcloud.android.crop.Crop;
+
 import com.tcc.denguedetection.R;
 import com.tcc.denguedetection.activities.login.MainActivity;
 import com.tcc.denguedetection.activities.prediction.DenguePrediction;
 import com.tcc.denguedetection.activities.sceneform.ImageCapture;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+// https://github.com/Yalantis/uCrop
 public class CropImage extends AppCompatActivity {
 
     private ImageView cropImageView;
@@ -41,25 +42,29 @@ public class CropImage extends AppCompatActivity {
         Uri inputUri = Uri.fromFile(photoFile);
         Uri outPutUri = Uri.fromFile(cropFile);
 
-        Crop.of(inputUri, outPutUri).asSquare().start(CropImage.this);
+        //Crop.of(inputUri, outPutUri).asSquare().start(CropImage.this);
+        UCrop.of(inputUri, outPutUri)
+                .withAspectRatio(0.5f, 0.5f)
+                .withMaxResultSize(32, 32)
+                .start(CropImage.this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Crop.REQUEST_CROP){
+        if(requestCode == UCrop.REQUEST_CROP){
             handleCrop(resultCode, data);
         }
     }
 
     private void handleCrop(int resultCode, Intent result){
         if(resultCode == RESULT_OK){
-            Uri cropImageUri = Crop.getOutput(result);
+            Uri cropImageUri = UCrop.getOutput(result);
             Intent intent = new Intent(CropImage.this, DenguePrediction.class);
             intent.putExtra("cropImageUri", cropImageUri);
             startActivity(intent);
-        }else if( resultCode == Crop.RESULT_ERROR){
-            Toast.makeText(CropImage.this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
+        }else if( resultCode == UCrop.RESULT_ERROR){
+            Toast.makeText(CropImage.this, UCrop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

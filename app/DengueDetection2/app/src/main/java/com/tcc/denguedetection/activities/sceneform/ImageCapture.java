@@ -20,7 +20,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.soundcloud.android.crop.Crop;
 import com.tcc.denguedetection.R;
 import com.tcc.denguedetection.activities.crop.CropImage;
 import com.tcc.denguedetection.activities.prediction.DenguePrediction;
@@ -126,7 +125,7 @@ public class ImageCapture extends AppCompatActivity {
                 FileOutputStream outputStream = new FileOutputStream(filename);
                 ByteArrayOutputStream outputData = new ByteArrayOutputStream()
         ) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputData);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputData);
             outputData.writeTo(outputStream);
             outputStream.flush();
             outputStream.close();

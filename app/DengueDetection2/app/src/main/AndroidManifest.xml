@@ -9,8 +9,7 @@
         tools:node="replace" />
 
     <uses-feature
-        android:name="android.hardware.camera.ar"
-        android:required="true" />
+        android:name="android.hardware.camera.ar" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +20,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activities.crop.CropImage"></activity>
-        <activity android:name="com.soundcloud.android.crop.CropImageActivity"></activity>
+        <!--<activity android:name="com.soundcloud.android.crop.CropImageActivity"></activity>-->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".activities.prediction.DenguePrediction" />
         <activity
             android:name=".activities.sceneform.ImageCapture"
@@ -37,7 +40,7 @@
 
         <meta-data
             android:name="com.google.ar.core"
-            android:value="required" />
+            android:value="optional" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

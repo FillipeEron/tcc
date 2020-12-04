@@ -32,7 +32,7 @@ public class ImageProcessing {
     private Mat sourceMatImage = new Mat();
 
     public ImageProcessing(Bitmap sourceImage) {
-        this.sourceBitImage  = getResizedBitmap( sourceImage.copy(Bitmap.Config.ARGB_8888, true), 227, 227 );
+        this.sourceBitImage  = getResizedBitmap( sourceImage.copy(Bitmap.Config.ARGB_8888, true), 32, 32 );
         Utils.bitmapToMat(this.sourceBitImage, this.sourceMatImage);
     }
 
